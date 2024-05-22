@@ -13,12 +13,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Ensure we have full history to manipulate tags.
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: "3.10"
 
@@ -28,17 +28,13 @@ jobs:
           pip install towncrier
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
-          node-version: "14"
+          node-version: "20"
 
-      - name: Build Chrome extension
+      - name: Build Chome and Firefox extension
         run: |
-          make chrome VERSION="${{ github.event.inputs.version }}"
-
-      - name: Build Firefox extension
-        run: |
-          make firefox VERSION="${{ github.event.inputs.version }}"
+          make all VERSION="${{ github.event.inputs.version }}"
 
       - name: Generate draft release notes with Towncrier
         run: |
@@ -53,7 +49,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add CHANGES.md
-          git commit -m "Generate release notes and update changelog for version ${{ github.event.inputs.version }}"
+          git commit -m "Generate release notes for version ${{ github.event.inputs.version }}."
           git push origin main
 
       - name: Create tag
@@ -66,7 +62,7 @@ jobs:
         with:
           tag_name: ${{ github.event.inputs.version }}
           name: ${{ github.event.inputs.version }}
-          draft: true  # Set to true to create a draft release.
+          draft: false  # Set to true to create a draft release.
           prerelease: false
           body_path: draft_release_notes.md
           files: |
