@@ -37,7 +37,7 @@ chrome: clean
 	cp -r ./src/* $(CHROME_DIR)
 	mv $(CHROME_DIR)/chrome-manifest.json $(CHROME_DIR)/manifest.json
 	rm $(CHROME_DIR)/firefox-manifest.json
-	sed -i '' 's/"version": "[0-9]*\.[0-9]*\.[0-9]*"/"version": "$(VERSION)"/' $(CHROME_DIR)/manifest.json
+	perl -pi -e 's/"version": "[0-9]+\.[0-9]+\.[0-9]+"/"version": "$(VERSION)"/' $(CHROME_DIR)/manifest.json
 	cd $(CHROME_DIR) && zip -r ../chrome-antares2goats-$(VERSION).zip .
 
 # Build Firefox extension.
@@ -46,5 +46,5 @@ firefox: clean
 	cp -r ./src/* $(FIREFOX_DIR)
 	mv $(FIREFOX_DIR)/firefox-manifest.json $(FIREFOX_DIR)/manifest.json
 	rm $(FIREFOX_DIR)/chrome-manifest.json
-	sed -i '' 's/"version": "[0-9]*\.[0-9]*\.[0-9]*"/"version": "$(VERSION)"/' $(FIREFOX_DIR)/manifest.json
+	perl -pi -e 's/"version": "[0-9]+\.[0-9]+\.[0-9]+"/"version": "$(VERSION)"/' $(FIREFOX_DIR)/manifest.json
 	cd $(FIREFOX_DIR) && zip -r ../firefox-antares2goats-$(VERSION).zip .
