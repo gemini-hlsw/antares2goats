@@ -14,7 +14,7 @@
     "default_title": "Parse and send object or query to GOATS.",
     "default_badge": ""
   },
-  "description": "Enhance your GOATS experience by seamlessly integrating query capabilities and target selection from ANTARES directly into GOATS with just a single click.",
+  "description": "Enhance GOATS by seamlessly integrating query capabilities and target selection from ANTARES directly into GOATS with just a click.",
   "background": {
     "service_worker": "background.js",
     "type": "module"
