@@ -11,9 +11,9 @@ all: clean chrome firefox
 # Provide a list of available commands.
 help:
 	@echo "Available targets:"
-	@echo "  make all VERSION=YY.MM.Major     - Build both Chrome and Firefox extensions (default)"
-	@echo "  make chrome VERSION=YY.MM.Major  - Build Chrome extension"
-	@echo "  make firefox VERSION=YY.MM.Major - Build Firefox extension"
+	@echo "  make all VERSION=YY.MM.Micro     - Build both Chrome and Firefox extensions (default)"
+	@echo "  make chrome VERSION=YY.MM.Micro  - Build Chrome extension"
+	@echo "  make firefox VERSION=YY.MM.Micro - Build Firefox extension"
 	@echo "  make clean                       - Clean build directories"
 	@echo ""
 	@echo "Do not use leading zeros in the version number!"
@@ -27,7 +27,7 @@ clean:
 # Version check, specific to each target.
 ifeq ($(filter $(MAKECMDGOALS), help clean),)
 ifeq ($(VERSION),)
-$(error VERSION is not set. Use `make VERSION=YY.MM.Major` to set the version.)
+$(error VERSION is not set. Use `make VERSION=YY.MM.Micro` to set the version.)
 endif
 endif
 
