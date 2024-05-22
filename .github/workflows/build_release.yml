@@ -27,6 +27,19 @@ jobs:
           python -m pip install --upgrade pip
           pip install towncrier
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+
+      - name: Build Chrome extension
+        run: |
+          make chrome VERSION="${{ github.event.inputs.version }}"
+
+      - name: Build Firefox extension
+        run: |
+          make firefox VERSION="${{ github.event.inputs.version }}"
+
       - name: Generate draft release notes with Towncrier
         run: |
           towncrier build --draft --version "${{ github.event.inputs.version }}" > draft_release_notes.md
@@ -39,7 +52,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add CHANGELOG.md
+          git add CHANGES.md
           git commit -m "Generate release notes and update changelog for version ${{ github.event.inputs.version }}"
           git push origin main
 
@@ -48,24 +61,14 @@ jobs:
           git tag -a "${{ github.event.inputs.version }}" -m "Release ${{ github.event.inputs.version }}"
           git push origin "${{ github.event.inputs.version }}"
 
-      - name: Create GitHub draft release
-        id: create_release
-        uses: actions/create-release@v1
+      - name: Create GitHub release and upload artifacts
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event.inputs.version }}
-          release_name: ${{ github.event.inputs.version }}
+          name: ${{ github.event.inputs.version }}
           draft: true  # Set to true to create a draft release.
           prerelease: false
           body_path: draft_release_notes.md
-
-      - name: Upload Chrome extension artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: chrome-extension
-          path: build/chrome-antares2goats-${{ github.event.inputs.version }}.zip
-
-      - name: Upload Firefox extension artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: firefox-extension
-          path: build/firefox-antares2goats-${{ github.event.inputs.version }}.zip
+          files: |
+            build/chrome-antares2goats-${{ github.event.inputs.version }}.zip
+            build/firefox-antares2goats-${{ github.event.inputs.version }}.zip
