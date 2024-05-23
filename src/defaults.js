@@ -1,6 +1,6 @@
 // Used throughout the browser extension.
 export const DEFAULT_SETTINGS = {
-  url: "localhost",
+  url: "http://127.0.0.1",
   port: "8000",
   token: "",
 };
