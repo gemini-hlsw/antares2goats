@@ -1,1 +1,0 @@
-Improved UI: Improved feedback for unauthorized queries and targets pushed to GOATS.
