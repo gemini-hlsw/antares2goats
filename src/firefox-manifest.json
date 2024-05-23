@@ -3,7 +3,7 @@
   "name": "antares2goats",
   "version": "0.0.0",
   "permissions": ["activeTab", "tabs", "contextMenus", "storage"],
-  "host_permissions": ["http://localhost:8000/receive_query/"],
+  "host_permissions": ["http://localhost/*", "http://127.0.0.1/*"],
   "browser_specific_settings": {
     "gecko" : {
       "id": "goats@noirlab.edu"

@@ -1,4 +1,4 @@
-import { DEFAULT_SETTINGS } from './defaults.js';
+import { DEFAULT_SETTINGS } from "./defaults.js";
 
 /**
  * An object representing the colors for badge background.
@@ -9,7 +9,7 @@ const COLORS = {
   GREEN: [0, 255, 0, 255],
   RED: [255, 0, 0, 255],
   WHITE: [255, 255, 255, 255],
-  DEFAULT: [128, 128, 128, 255]
+  DEFAULT: [128, 128, 128, 255],
 };
 
 /**
@@ -117,34 +117,35 @@ chrome.action.onClicked.addListener(async (tab) => {
         const token = items.token || DEFAULT_SETTINGS.token;
 
         // Construct the URL using the retrieved items.
-        const baseUrl = `http://${url}:${port}/receive_query/`;
+        const baseUrl = `${url}:${port}/receive_query/`;
 
         // Send data to app.
         const response = await fetch(baseUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Token ${token}`,
+            Authorization: `Token ${token}`,
           },
           body: JSON.stringify(dataToSend),
         });
 
         // Check if the response status is in the 2xx success range.
-        if (response.status >= 200 && response.status < 300) {
+        if (response.status >= 200 && response.status < 300 && !response.redirected) {
           chrome.action.setBadgeBackgroundColor({ color: COLORS.GREEN, tabId: tab.id });
           chrome.action.setBadgeText({ text: "✓", tabId: tab.id });
         } else {
-          if (response.status === 401) {
+          if (response.status === 401 || response.redirected) {
             // Change badge to red and token icon.
             chrome.action.setBadgeBackgroundColor({ color: COLORS.RED, tabId: tab.id });
             chrome.action.setBadgeText({ text: "TKN", tabId: tab.id });
-          }
-          else if (response.status === 409) {
+          } else if (response.status === 409) {
             // Change badge to yellow and duplicate icon.
-            chrome.action.setBadgeBackgroundColor({ color: COLORS.YELLOW, tabId: tab.id });
+            chrome.action.setBadgeBackgroundColor({
+              color: COLORS.YELLOW,
+              tabId: tab.id,
+            });
             chrome.action.setBadgeText({ text: "DUP", tabId: tab.id });
-          }
-          else {
+          } else {
             // If the response status is not in the 2xx range, throw an error.
             throw new Error(`${response.statusText}`);
           }
@@ -180,7 +181,7 @@ const transformQuery = (receivedQuery) => {
   const { filters } = receivedQuery;
 
   // Map each filter object to a new object that fits the desired query format.
-  const mustArray = filters.map(filter => {
+  const mustArray = filters.map((filter) => {
     // Extract relevant properties from each filter object.
     const { type, field, value } = filter;
 
@@ -188,8 +189,8 @@ const transformQuery = (receivedQuery) => {
     // the desired format.
     return {
       [type]: {
-        [field]: value
-      }
+        [field]: value,
+      },
     };
   });
 
@@ -199,10 +200,10 @@ const transformQuery = (receivedQuery) => {
       bool: {
         filter: {
           bool: {
-            must: mustArray
-          }
-        }
-      }
-    }
+            must: mustArray,
+          },
+        },
+      },
+    },
   };
 };
