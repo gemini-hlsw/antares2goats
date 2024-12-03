@@ -1,3 +1,10 @@
+## antares2goats 24.12.0 (2024-12-03)
+
+
+### Changes
+
+- Updated URL for new API endpoint in GOATS. [[#GOATS-383](https://noirlab.atlassian.net/browse/GOATS-383)]
+
 ## antares2goats 24.5.1 (2024-05-23)
 
 
