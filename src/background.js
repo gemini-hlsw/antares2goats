@@ -115,9 +115,10 @@ chrome.action.onClicked.addListener(async (tab) => {
         const url = items.url || DEFAULT_SETTINGS.url;
         const port = items.port || DEFAULT_SETTINGS.port;
         const token = items.token || DEFAULT_SETTINGS.token;
+        const apiEndpoint = DEFAULT_SETTINGS.apiEndpoint
 
         // Construct the URL using the retrieved items.
-        const baseUrl = `${url}:${port}/receive_query/`;
+        const baseUrl = `${url}:${port}${apiEndpoint}`;
 
         // Send data to app.
         const response = await fetch(baseUrl, {
