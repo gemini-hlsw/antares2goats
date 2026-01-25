@@ -1,5 +1,5 @@
 // Import default settings to use.
-import { DEFAULT_SETTINGS } from './defaults.js';
+import { DEFAULT_SETTINGS } from "./defaults.js";
 
 /**
  * A lookup table for hosts and ports.
@@ -32,25 +32,45 @@ function handleSaveClick() {
   const url = document.getElementById("url").value;
   const port = document.getElementById("port").value;
   const token = document.getElementById("token").value;
-  chrome.storage.local.set({ url, port, token, }, () => {
-    // Display a "Settings Saved" message
-    const saveMessage = document.createElement("div");
+  const selectedEnv =
+    document.querySelector('input[name="antaresEnv"]:checked')?.value ||
+    DEFAULT_SETTINGS.antaresEnv;
+
+  chrome.storage.local.set({ url, port, token, antaresEnv: selectedEnv }, () => {
+    let saveMessage = document.getElementById("saveMessage");
+    if (!saveMessage) {
+      saveMessage = document.createElement("div");
+      saveMessage.id = "saveMessage";
+      document.body.appendChild(saveMessage);
+    }
+
     saveMessage.textContent = "Settings Saved.";
-    document.body.appendChild(saveMessage);
+
+    // Clear any existing timeout to avoid multiple timers.
+    window.clearTimeout(saveMessage._timeoutId);
+    saveMessage._timeoutId = window.setTimeout(() => {
+      saveMessage.textContent = "";
+    }, 2000);
   });
 }
 
 /**
- * Loads the previously saved URL, port, and token when the options page is
+ * Loads the previously saved URL, port, token, and ANTARES environment when the options page is
  * loaded.
  */
 const loadPreviousSettings = () => {
-  chrome.storage.local.get(["url", "port", "token"], (items) => {
+  chrome.storage.local.get(["url", "port", "token", "antaresEnv"], (items) => {
     document.getElementById("url").value = items.url || DEFAULT_SETTINGS.url;
     document.getElementById("port").value = items.port || DEFAULT_SETTINGS.port;
     document.getElementById("token").value = items.token || DEFAULT_SETTINGS.token;
+
+    const env = items.antaresEnv || DEFAULT_SETTINGS.antaresEnv;
+    const prod = document.getElementById("antaresProd");
+    const dev = document.getElementById("antaresDev");
+    prod.checked = env === "PRODUCTION";
+    dev.checked = env === "DEVELOPMENT";
   });
-}
+};
 
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementsByName("mode").forEach((radioButton) => {
@@ -58,7 +78,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   document.getElementById("saveButton").addEventListener("click", handleSaveClick);
-});
 
-// Load the previously saved settings when the options page is loaded.
-window.onload = loadPreviousSettings;
+  loadPreviousSettings();
+});

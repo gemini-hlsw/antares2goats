@@ -13,18 +13,35 @@ const COLORS = {
 };
 
 /**
- * The trusted hostname for checking the URL.
- * @type {string}
+ * Get the ANTARES base URL from storage or defaults.
+ *
+ * @async
+ * @returns {Promise<string>} The ANTARES base URL.
  */
-const ANTARES_URL = "https://antares.noirlab.edu/loci";
+const getAntaresBaseUrl = async () => {
+  const { antaresEnv } = await chrome.storage.local.get(["antaresEnv"]);
+  const env = antaresEnv || DEFAULT_SETTINGS.antaresEnv;
+  return DEFAULT_SETTINGS.antaresUrls[env] || DEFAULT_SETTINGS.antaresUrls.PRODUCTION;
+};
+
+/**
+ * Get the ANTARES URL for badge checking.
+ * @async
+ * @returns {Promise<string>} The ANTARES loci URL prefix.
+ */
+const getAntaresLociPrefix = async () => {
+  const baseUrl = await getAntaresBaseUrl();
+  return `${baseUrl}/loci`;
+};
 
 /**
  * Resets the badge color and text based on the tab URL.
  *
  * @param {chrome.tabs.Tab} tab - The tab where the URL is checked.
  */
-const resetBadgeColor = (tab) => {
-  const isTrustedHost = tab.url.startsWith(ANTARES_URL);
+const resetBadgeColor = async (tab) => {
+  const lociPrefix = await getAntaresLociPrefix();
+  const isTrustedHost = tab.url.startsWith(lociPrefix);
   const badgeColor = isTrustedHost ? COLORS.WHITE : COLORS.DEFAULT;
   const badgeText = isTrustedHost ? "→" : "✗";
 
@@ -42,7 +59,7 @@ const resetBadgeColor = (tab) => {
  */
 const onTabUpdated = (tabId, changeInfo, tab) => {
   if (changeInfo.status === "complete" && tab.url) {
-    resetBadgeColor(tab);
+    void resetBadgeColor(tab);
   }
 };
 
@@ -74,13 +91,21 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 chrome.action.onClicked.addListener(async (tab) => {
   // Parse the current URL of the active tab.
   const currentURL = new URL(tab.url);
+  const lociPrefix = await getAntaresLociPrefix();
+  const expected = new URL(lociPrefix);
+
   // Split the pathname to get individual elements.
   const pathnameArray = currentURL.pathname.split("/");
   // Initialize an empty object to hold the data to send.
   let dataToSend = {};
 
+  const isAntaresLoci =
+    currentURL.origin === expected.origin && pathnameArray[1] === "loci";
+
   // Check if the hostname and pathname match the specified conditions.
-  if (currentURL.hostname === "antares.noirlab.edu" && pathnameArray[1] === "loci") {
+  if (!isAntaresLoci) {
+    return;
+  } else {
     // If a query parameter exists in the URL.
     if (currentURL.searchParams.get("query")) {
       // Get the query parameter.
@@ -115,7 +140,7 @@ chrome.action.onClicked.addListener(async (tab) => {
         const url = items.url || DEFAULT_SETTINGS.url;
         const port = items.port || DEFAULT_SETTINGS.port;
         const token = items.token || DEFAULT_SETTINGS.token;
-        const apiEndpoint = DEFAULT_SETTINGS.apiEndpoint
+        const apiEndpoint = DEFAULT_SETTINGS.apiEndpoint;
 
         // Construct the URL using the retrieved items.
         const baseUrl = `${url}:${port}${apiEndpoint}`;
