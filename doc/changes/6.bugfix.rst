@@ -1,0 +1,1 @@
+Fixed Elasticsearch query parsing error in the antares2goats extension

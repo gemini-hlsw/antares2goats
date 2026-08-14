@@ -186,6 +186,10 @@ const transformQuery = (receivedQuery) => {
     // Extract relevant properties from each filter object.
     const { type, field, value } = filter;
 
+    if (value === undefined) {
+      return { [type]: { field } };
+    }
+
     // Return a new object where the keys and values are organized according to
     // the desired format.
     return {
