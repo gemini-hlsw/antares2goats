@@ -1,3 +1,15 @@
+## antares2goats 26.8.0 (2026-08-26)
+
+
+### New Features
+
+- Added LICENSE to repository. [[#GOATS-151](https://noirlab.atlassian.net/browse/GOATS-151)]
+
+
+### Bug Fixes
+
+- Fixed Elasticsearch query parsing error in the antares2goats extension [[#6](https://noirlab.atlassian.net/browse/6)]
+
 ## antares2goats 24.12.0 (2024-12-03)
 
 
